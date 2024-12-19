@@ -16,6 +16,7 @@ func NewBlockchain() *Blockchain {
 	}
 }
 
+// add new user
 func (bc *Blockchain) AddUser(user *User) {
 	bc.notifiedUsers = append(bc.notifiedUsers, user)
 	for _, u := range bc.notifiedUsers {
@@ -25,14 +26,17 @@ func (bc *Blockchain) AddUser(user *User) {
 	}
 }
 
+// add transaction
 func (bc *Blockchain) AddTransaction(transaction *Transaction) {
 	var block *Block
+	//create block depeend on previous block, if not, previous hash = 0
 	if len(bc.blockList) == 0 {
 		block = NewBlock(0, transaction)
 	} else {
 		block = NewBlock(bc.blockList[len(bc.blockList)-1].Hash(), transaction)
 	}
 
+	//checking nonce and update users blockchain
 	if bc.CheckNonce(transaction.Performed) {
 		bc.blockList = append(bc.blockList, block)
 		for _, user := range bc.notifiedUsers {
@@ -43,6 +47,7 @@ func (bc *Blockchain) AddTransaction(transaction *Transaction) {
 	}
 }
 
+// check nonce by notify all users
 func (bc *Blockchain) CheckNonce(performed *User) bool {
 	for _, user := range bc.notifiedUsers {
 		if user != performed && user.LocalBlockchain() != bc {
